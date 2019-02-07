@@ -1,0 +1,28 @@
+<VirtualHost *:80>
+
+  ServerAdmin {{ has_srv_serveradmin }}
+
+  <Proxy *>
+     Order deny,allow
+     Allow from all
+  </Proxy>
+
+  ProxyPreserveHost On
+  ProxyRequests off
+  ProxyPass /api/websocket ws://localhost:8123/api/websocket/
+  ProxyPassReverse /api/websocket ws://localhost:8123/api/websocket/
+  ProxyPass / http://localhost:8123/
+  ProxyPassReverse / http://localhost:8123/
+
+
+  RewriteEngine on
+  RewriteCond %{HTTP:Upgrade} =websocket [NC]
+  RewriteRule /(.*)  ws://localhost:8123/$1 [P,L]
+  RewriteCond %{HTTP:Upgrade} !=websocket [NC]
+  RewriteRule /(.*)  http://localhost:8123/$1 [P,L]
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+

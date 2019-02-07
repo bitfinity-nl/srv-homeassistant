@@ -1,0 +1,17 @@
+---
+  # Title: Home Assistant
+  #
+  # Author: bitfinity.nl
+  # File: defaults/main.yml
+  #
+  # Description:
+  #   Open source home automation that puts local control and privacy first.
+
+  # -- Apache2 reverse proxy settings --
+  #
+  # Variable(s)
+  #     has_srv_serveradmin : 'support@example.com' 
+  #     has_: 'http' or 'https'  # Whether use http or https for the url, default=http (https requires certificates).
+  #
+  has_srv_serveradmin : 'support@bitfinity.nl'
+  has_url_protocol    : 'http'

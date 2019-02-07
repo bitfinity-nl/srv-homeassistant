@@ -1,0 +1,84 @@
+---
+  # Title: Home Assistant (https experimental)
+  #
+  # Author: bitfinity.nl
+  # File: tasks/apach2-rev-proxy.yml
+  #
+  # Description:
+  #   Open source home automation that puts local control and privacy first.
+  #
+  # Sources:
+  #   - https://www.home-assistant.io/docs/ecosystem/apache/
+  #
+
+  - name: "Install packages"
+    apt:
+      name: "{{ packages }}"
+      state: latest
+    vars:
+      packages:
+      - apache2
+  
+  - name: "Enable Apache2 modules"
+    apache2_module:
+      state: present
+      name: "{{ item }}"
+    with_items:
+      - proxy
+      - proxy_http
+      - proxy_ajp
+      - proxy_fcgi
+      - rewrite
+      - deflate
+      - headers
+      - proxy_balancer
+      - proxy_connect
+      - proxy_html
+      - proxy_wstunnel
+  
+  - name: "Transfer templates"
+    template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+      - { src: 'apache2/homeassistant.conf.j2', dest: '/etc/apache2/sites-available/homeassistant.conf' }
+#      - { src: 'apache2/homeassistant.conf.j2', dest: '/etc/apache2/conf-available/homeassistant.conf' }
+#      - { src: 'apache2/homeassistant-ssl.conf.j2', dest: '/etc/apache2/sites-available/homeassistant-ssl.conf' }
+
+  - name: "Disable http site /etc/apache2/sites-available/000-default.conf"
+    command: "a2dissite {{ item }}"
+    with_items:
+      - 000-default.conf
+    when:
+      - has_url_protocol == 'http'
+
+#  - name: "Enable http configuration on default site"
+#    command: "a2enconf {{ item }}"
+#    with_items:
+#      - homeassistant.conf
+#    when:
+#      - has_url_protocol == 'http'
+#    notify:
+#      - restart_apache
+
+  - name: "Enable http on default site"
+    command: "a2ensite {{ item }}"
+    with_items:
+      - homeassistant.conf
+    when:
+      - has_url_protocol == 'http'
+    notify:
+      - restart_apache
+  
+  - name: "UFW allow traffic on specific ports"
+    ufw:
+      rule: allow
+      direction: "{{ item.dir }}"
+      port: "{{ item.port }}"
+      proto: "{{ item.proto }}"
+    with_items:
+      - { dir: 'in', port: '80', proto: 'tcp' }
+      - { dir: 'in', port: '443', proto: 'tcp' }

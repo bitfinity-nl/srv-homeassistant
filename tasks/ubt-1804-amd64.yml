@@ -1,0 +1,83 @@
+---
+  # Title: Home Assistant
+  #
+  # Author: bitfinity.nl
+  # File: tasks/ubt-1804-amd64.yml
+  #
+  # Description:
+  #   Open source home automation that puts local control and privacy first.
+  #
+  # Sources:
+  #   - https://www.home-assistant.io/docs/installation/raspberry-pi/
+  #   - https://www.home-assistant.io/docs/installation/virtualenv/
+
+  - name: "Check if Home Assistant allready is installed"
+    stat:
+      path: /lib/systemd/system/homeassistant.service
+    register: homeassistant_isinstalled
+
+  - name: "Print to screen if client is allready installed"
+    debug:
+      msg: "{{ homeassistant_isinstalled.stat.exists }}"     
+
+  - name: "Install packages"
+    apt:
+      name: "{{ packages }}"
+      state: latest
+    vars:
+      packages:
+      - python3
+      - python3-dev
+      - python3-venv
+      - python3-pip
+      - libffi-dev
+      - python3-minimal
+      - python3-setuptools
+#      - build-essential
+#      - libssl-dev 
+
+  - name: "Create useraccount homeassistant for running homeassistant"
+    user:
+      name: homeassistant
+      shell: /bin/bash
+      groups: dialout
+      append: yes    
+
+  - name: "Create directory for homeassistant"
+    file:
+       path: /opt/homeassistant
+       state: directory
+       owner: homeassistant
+       group: homeassistant
+       mode: 0755
+
+  - name: "Transfer template install-homeassistant.sh.j2 to {{ ansible_host }}"
+    template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: homeassistant
+      group: homeassistant
+      mode: 0775
+    with_items:
+      - { src: 'install-homeassistant.sh.j2', dest: '/tmp/install-homeassistant.sh' }
+      - { src: 'upgrade-homeassistant.sh.j2', dest: '/tmp/upgrade-homeassistant.sh' }
+
+  - name: "Execute install script /tmp/install-homeassistant.sh"
+    shell: sudo su - homeassistant -c /tmp/install-homeassistant.sh
+    when:
+      - homeassistant_isinstalled.stat.exists == false
+
+  - name: "Execute upgrade script /tmp/upgrade-homeassistant.sh"
+    shell: sudo su - homeassistant -c /tmp/upgrade-homeassistant.sh
+    when:
+      - homeassistant_isinstalled.stat.exists == true
+
+  - name: "Transfer template homeassistant.service.j2 to {{ ansible_host }}"
+    template:
+      src: homeassistant.service.j2
+      dest: /lib/systemd/system/homeassistant.service
+      owner: root
+      group: root
+      mode: 0755
+    notify:
+      - enable_start_homeassistant

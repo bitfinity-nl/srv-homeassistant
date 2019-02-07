@@ -1,0 +1,10 @@
+[Unit]
+Description=Home Assistant
+After=syslog.target network.target
+
+[Service]
+ExecStart=/opt/homeassistant/bin/hass
+User=homeassistant
+
+[Install]
+WantedBy=multi-user.target

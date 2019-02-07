@@ -1,0 +1,20 @@
+---
+  # Title: Home Assistant
+  #
+  # Author: bitfinity.nl
+  # File: tasks/main.yml
+  #
+  # Description:
+  #   Open source home automation that puts local control and privacy first.
+
+  - name: "Type:Appserver, For OS: Ubuntu 18.04LTS, Arch: amd64, State: Enabled"
+    import_tasks: ubt-1804-amd64.yml
+    when:
+      - ansible_distribution_version == '18.04'
+      - ansible_architecture == 'x86_64'
+
+  - name: "Type:Webserver, For OS: Ubuntu 18.04LTS, Arch: amd64, State: Enabled"
+    import_tasks: apach2-rev-proxy.yml
+    when:
+      - ansible_distribution_version == '18.04'
+      - ansible_architecture == 'x86_64'

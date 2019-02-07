@@ -1,0 +1,19 @@
+---
+  # Title: Home Assistant
+  #
+  # Author: bitfinity.nl
+  # File: handlers/main.yml
+  #
+  # Description:
+  #   Open source home automation that puts local control and privacy first.
+
+  - name: "enable_start_homeassistant"
+    systemd:
+       name: homeassistant
+       state: started
+       enabled: yes
+  
+  - name: restart_apache
+    systemd:
+      name: apache2
+      state: restarted

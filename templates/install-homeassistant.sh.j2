@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# 1. Create and change to a virtual environment for Home Assistant.
+cd /opt/homeassistant && python3 -m venv . && source bin/activate
+
+# 2. Install a required python package.
+python3 -m pip install wheel
+
+# 3. Install Home Assistant. 
+pip3 install homeassistant
