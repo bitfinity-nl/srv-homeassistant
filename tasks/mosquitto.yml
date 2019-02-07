@@ -37,5 +37,5 @@
       port: "{{ item.port }}"
       proto: "{{ item.proto }}"
     with_items:
-#      - { dir: 'in', port: '1883', proto: 'tcp' }
+      - { dir: 'in', port: '1883', proto: 'tcp' }
       - { dir: 'in', port: '1884', proto: 'tcp' }
