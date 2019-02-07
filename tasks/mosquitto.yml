@@ -1,0 +1,41 @@
+---
+  # Title: Home Assistant
+  #
+  # Author: bitfinity.nl
+  # File: tasks/mosquitto.yml
+  #
+  # Description:
+  #   Add-on MQTT broker.
+  #
+  # Sources:
+  #   - https://mosquitto.org/download/
+
+  - name: "Add additional repositories"
+    apt_repository:
+      repo: "{{ item }}"
+      state: present
+    with_items:
+      - ppa:mosquitto-dev/mosquitto-ppa
+
+  - name: "Update cache package manager"
+    apt:
+      update_cache: yes
+
+  - name: "Install packages"
+    apt:
+      name: "{{ packages }}"
+      state: latest
+    vars:
+      packages:
+      - mosquitto
+      - mosquitto-clients
+
+  - name: "UFW allow traffic on specific ports"
+    ufw:
+      rule: allow
+      direction: "{{ item.dir }}"
+      port: "{{ item.port }}"
+      proto: "{{ item.proto }}"
+    with_items:
+#      - { dir: 'in', port: '1883', proto: 'tcp' }
+      - { dir: 'in', port: '1884', proto: 'tcp' }

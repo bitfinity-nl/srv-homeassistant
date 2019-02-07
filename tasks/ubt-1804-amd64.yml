@@ -81,3 +81,13 @@
       mode: 0755
     notify:
       - enable_start_homeassistant
+
+  - name: "UFW allow traffic on specific ports"
+    ufw:
+      rule: allow
+      direction: "{{ item.dir }}"
+      port: "{{ item.port }}"
+      proto: "{{ item.proto }}"
+    with_items:
+      - { dir: 'in', port: '8123', proto: 'tcp' }
+
