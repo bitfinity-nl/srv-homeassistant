@@ -1,0 +1,15 @@
+allow_anonymous false
+password_file /etc/mosquitto/passwd
+listener 1883 localhost
+
+listener 8883
+protocol websockets
+certfile {{ mos_ssl_certfile }}
+cafile {{ mos_ssl_cafile }}
+keyfile {{ mos_ssl_keyfile }}
+
+listener 8083
+protocol websockets
+certfile {{ mos_ssl_certfile }}
+cafile {{ mos_ssl_cafile }}
+keyfile {{ mos_ssl_keyfile }}

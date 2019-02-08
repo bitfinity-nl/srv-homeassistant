@@ -31,17 +31,7 @@
       - mosquitto
       - mosquitto-clients
 
-  - name: "UFW allow traffic on specific ports"
-    ufw:
-      rule: allow
-      direction: "{{ item.dir }}"
-      port: "{{ item.port }}"
-      proto: "{{ item.proto }}"
-    with_items:
-      - { dir: 'in', port: '1883', proto: 'tcp' }
-      - { dir: 'in', port: '1884', proto: 'tcp' }
-
-  - name: "Create mosquitto directory structure"
+  - name: "Create mosquitto password file"
     file:
       path: "{{ item }}"
       state: touch
@@ -49,11 +39,11 @@
       - /etc/mosquitto/passwd 
 
   - name: "Generate password for home Assistant"
-    shell: "mosquitto_passwd -b /etc/mosquitto/passwd homeassistant {{ mos_has_passwd }}"
+    shell: "mosquitto_passwd -b /etc/mosquitto/passwd {{ mos_has_user }} {{ mos_has_passwd }}"
     notify:
       - restart_mosquitto    
 
-  - name: "Transfer templates mosquitto/default.conf.j2 to /etc/mosquitto/conf.d/default.conf"
+  - name: "Transfer templates mosquitto/default.conf.j2 to /etc/mosquitto/conf.d/default.conf for unencrypted traffice"
     template:
       src: "{{ item.src }}"
       dest: "{{ item.dest }}"
@@ -62,4 +52,46 @@
       mode: 0755
     with_items:  
         - {src: 'mosquitto/default.conf.j2', dest: '/etc/mosquitto/conf.d/default.conf' }
+    when:
+      - mos_use_ssl == 'false'
+    notify:
+      - restart_mosquitto
+
+  - name: "Transfer templates mosquitto/default.conf.j2 to /etc/mosquitto/conf.d/default.conf for encrypted traffic"
+    template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: 0755
+    with_items:
+        - {src: 'mosquitto/default-ssl.conf.j2', dest: '/etc/mosquitto/conf.d/default-ssl.conf' }
+    when:
+      - mos_use_ssl == 'true'
+    notify:
+      - restart_mosquitto
+
+  - name: "UFW allow traffic on specific ports"
+    ufw:
+      rule: allow
+      direction: "{{ item.dir }}"
+      port: "{{ item.port }}"
+      proto: "{{ item.proto }}"
+    with_items:
+      - { dir: 'in', port: '1883', proto: 'tcp' }
+    when:
+      - mos_use_ssl == 'false'
+    
+  - name: "UFW allow traffic on specific ports"
+    ufw:
+      rule: allow
+      direction: "{{ item.dir }}"
+      port: "{{ item.port }}"
+      proto: "{{ item.proto }}"
+    with_items:
+      - { dir: 'in', port: '8883', proto: 'tcp' }
+      - { dir: 'in', port: '8083', proto: 'tcp' }
+    when:
+      - mos_use_ssl == 'true'
+
 

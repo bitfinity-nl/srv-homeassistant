@@ -19,4 +19,17 @@
 
   # -- Mosquitto MQTT broker -- 
   #
-  mos_has_passwd: 'welkom'
+  #  Variable(s)
+  #    mos_has_user     : 'homeassistant'                                       # Specify user.
+  #    mos_has_passwd   : 'welkom'                                              # Specify password.
+  #    mos_use_ssl      : 'false' or 'true'                                     # Whether to use SSL or not (Default=false).
+  #    mos_ssl_certfile : '/etc/letsencrypt/live/mqtt.example.com/cert.pem'     # Location where the cerfile is stored.
+  #    mos_ssl_cafile   : '/etc/letsencrypt/live/mqtt.example.com/chain.pem'    # Location where the cafile is stored.
+  #    mos_ssl_keyfile  : '/etc/letsencrypt/live/mqtt.example.com/privkey.pem'  # Location where the keyfile is stored.
+  #
+  mos_has_user     : 'homeassistant'
+  mos_has_passwd   : 'welkom'
+  mos_use_ssl      : 'false'
+  mos_ssl_certfile : '/etc/letsencrypt/live/mqtt.example.com/cert.pem'
+  mos_ssl_cafile   : '/etc/letsencrypt/live/mqtt.example.com/chain.pem'
+  mos_ssl_keyfile  : '/etc/letsencrypt/live/mqtt.example.com/privkey.pem'
