@@ -15,3 +15,8 @@
   #
   has_srv_serveradmin : 'support@bitfinity.nl'
   has_url_protocol    : 'http'
+
+
+  # -- Mosquitto MQTT broker -- 
+  #
+  mos_has_passwd: 'welkom'

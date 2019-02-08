@@ -17,3 +17,8 @@
     systemd:
       name: apache2
       state: restarted
+
+  - name: restart_mosquitto
+    systemd:
+      name: mosquitto
+      state: restarted
